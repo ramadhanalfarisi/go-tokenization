@@ -7,22 +7,17 @@ import (
 )
 
 type StemmingService struct {
-	Language string
 }
 
-func NewStemmingService(lang string) StemmingServiceInterface {
-	return &StemmingService{Language: lang}
+func NewStemmingService() StemmingServiceInterface {
+	return &StemmingService{}
 }
 
 func (s *StemmingService) getContainsOrginialWord(str string) bool {
-	if s.Language == "ID" {
-		stopword := originalwords.Indonesian
-		var _, isexist = stopword[str]
-		if isexist {
-			return true
-		} else {
-			return false
-		}
+	stopword := originalwords.Indonesian
+	var _, isexist = stopword[str]
+	if isexist {
+		return true
 	} else {
 		return false
 	}

@@ -23,6 +23,14 @@ func (s *FilteringService) checkContains(text string) bool {
 		} else {
 			return false
 		}
+	}else if s.Language == "EN" {
+		stopword := stopwords.English
+		var _, isexist = stopword[text]
+		if isexist {
+			return true
+		} else {
+			return false
+		}
 	} else {
 		return false
 	}

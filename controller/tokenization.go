@@ -6,7 +6,6 @@ import (
 	"github.com/ramadhanalfarisi/go-stopwords-filtering/service"
 )
 
-
 type TokenizationController struct{}
 
 func NewTokenizationController() TokenizationControllerInterface {
@@ -22,22 +21,38 @@ func (s *TokenizationController) StemText(g *gin.Context) {
 		output := make(chan string)
 		sservice := service.NewFilteringService(query.Language)
 		tservice := service.NewTokenizerService()
-		stservice := service.NewStemmingService(query.Language)
 		as := tservice.CreateToken(query.Text)
 		res := sservice.FilterText(as)
-		for _, item := range res {
-			go func(str string) {
-				str = stservice.StemText(str)
-				output <- str
-			}(item)
+		if query.Language == "ID" {
+			stservice := service.NewStemmingService()
+			for _, item := range res {
+				go func(str string) {
+					str = stservice.StemText(str)
+					output <- str
+				}(item)
+			}
+			for i := 0; i < len(res); i++ {
+				str := <-output
+				result = append(result, str)
+			}
+			g.JSON(200, gin.H{"status": "success", "data": result, "msg": "Stemming successfully"})
+		} else if query.Language == "EN" {
+			stservice := service.NewStemmingEnService()
+			for _, item := range res {
+				go func(str string) {
+					str = stservice.StemEnText(str)
+					output <- str
+				}(item)
+			}
+			for i := 0; i < len(res); i++ {
+				str := <-output
+				result = append(result, str)
+			}
+			g.JSON(200, gin.H{"status": "success", "data": result, "msg": "Stemming successfully"})
 		}
-		for i := 0; i < len(res); i++ {
-			str := <-output
-			result = append(result, str)
-		}
-		g.JSON(200, gin.H{"status": "success", "data": result, "msg" : "Stemming successfully"})
+
 	} else {
-		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg": err.Error()})
 	}
 }
 
@@ -48,9 +63,9 @@ func (s *TokenizationController) TokenizeText(g *gin.Context) {
 	if err := g.ShouldBind(&query); err == nil {
 		tservice := service.NewTokenizerService()
 		as := tservice.CreateToken(query.Text)
-		g.JSON(200, gin.H{"status": "success", "data": as, "msg" : "Tokenize successfully"})
+		g.JSON(200, gin.H{"status": "success", "data": as, "msg": "Tokenize successfully"})
 	} else {
-		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg": err.Error()})
 	}
 }
 
@@ -63,8 +78,8 @@ func (*TokenizationController) FilterText(g *gin.Context) {
 		tservice := service.NewTokenizerService()
 		as := tservice.CreateToken(query.Text)
 		res := sservice.FilterText(as)
-		g.JSON(200, gin.H{"status": "success", "data": res, "msg" : "Filtering successfully"})
+		g.JSON(200, gin.H{"status": "success", "data": res, "msg": "Filtering successfully"})
 	} else {
-		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg": err.Error()})
 	}
 }
