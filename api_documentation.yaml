@@ -1,0 +1,156 @@
+openapi: 3.0.0
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: Go Tokenization
+    url: http://localhost:8080
+info:
+  description: This is a tokenization API for tokenize, filtering, and stemming word in a sentence
+  version: "1.0.0"
+  title: Tokenization API
+  contact:
+    email: ramadhansalmanalfarisi8@gmail.com
+tags:
+  - name: client
+    description: Can use all of API
+paths:
+  /tokenize:
+    get:
+      tags:
+        - client
+      summary: get word tokens from sentence
+      operationId: tokenize
+      description: You can get all of word tokens from sentence by passing text and language request with url query
+      parameters:
+        - in: query
+          name: text
+          description: The sentence that you want to enter
+          required: true
+          example: Saya suka bermain sepak bola di lapangan
+          schema:
+            type: string
+        - in: query
+          name: lang
+          description: The language of sentence
+          example: ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: tokenize successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tokenize'
+        '400':
+          description: bad input parameter
+  /filtering:
+    get:
+      tags:
+        - client
+      summary: get meaningful words from sentence by removing stopwords
+      operationId: filtering
+      description: You can get all of meaningful words from sentence by passing text and language request with url query
+      parameters:
+        - in: query
+          name: text
+          description: The sentence that you want to enter
+          required: true
+          example: Saya suka bermain sepak bola di lapangan
+          schema:
+            type: string
+        - in: query
+          name: lang
+          description: The language of sentence
+          example: ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: filtering successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Filtering'
+        '400':
+          description: bad input parameter
+  /stemming:
+    get:
+      tags:
+        - client
+      summary: get original words from sentence
+      operationId: stemming
+      description: You can get all of original words from sentence by passing text and language request with url query
+      parameters:
+        - in: query
+          name: text
+          description: The sentence that you want to enter
+          required: true
+          example: Saya suka bermain sepak bola di lapangan
+          schema:
+            type: string
+        - in: query
+          name: lang
+          description: The language of sentence
+          example: ID
+          schema:
+            type: string
+      responses:
+        '200':
+          description: stemming successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Stemming'
+        '400':
+          description: bad input parameter  
+components:
+  schemas:
+    Tokenize:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: string
+          example: ["saya","suka","memasak"]
+        msg:
+          type: string
+          example: 'Tokenize successfully'
+    Filtering:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: string
+          example: ["belanja","produk","butuhkan"]
+        msg:
+          type: string
+          example: 'Filtering successfully'
+    Stemming:
+      type: object
+      properties:
+        status:
+          type: string
+          example: success
+        data:
+          type: array
+          items:
+            type: string
+          example: ["belanja","produk","butuh"]
+        msg:
+          type: string
+          example: 'Stemming successfully'
+    

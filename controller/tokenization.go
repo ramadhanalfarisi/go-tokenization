@@ -6,6 +6,7 @@ import (
 	"github.com/ramadhanalfarisi/go-stopwords-filtering/service"
 )
 
+
 type TokenizationController struct{}
 
 func NewTokenizationController() TokenizationControllerInterface {
@@ -16,7 +17,7 @@ func NewTokenizationController() TokenizationControllerInterface {
 func (s *TokenizationController) StemText(g *gin.Context) {
 	var query model.QueryTokenization
 
-	if g.ShouldBind(&query) == nil {
+	if err := g.ShouldBind(&query); err == nil {
 		var result []string
 		output := make(chan string)
 		sservice := service.NewFilteringService(query.Language)
@@ -34,9 +35,9 @@ func (s *TokenizationController) StemText(g *gin.Context) {
 			str := <-output
 			result = append(result, str)
 		}
-		g.JSON(200, gin.H{"status": "success", "data": result})
+		g.JSON(200, gin.H{"status": "success", "data": result, "msg" : "Stemming successfully"})
 	} else {
-		g.JSON(500, gin.H{"status": "failed", "data": nil})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
 	}
 }
 
@@ -44,12 +45,12 @@ func (s *TokenizationController) StemText(g *gin.Context) {
 func (s *TokenizationController) TokenizeText(g *gin.Context) {
 	var query model.QueryTokenization
 
-	if g.ShouldBind(&query) == nil {
+	if err := g.ShouldBind(&query); err == nil {
 		tservice := service.NewTokenizerService()
 		as := tservice.CreateToken(query.Text)
-		g.JSON(200, gin.H{"status": "success", "data": as})
+		g.JSON(200, gin.H{"status": "success", "data": as, "msg" : "Tokenize successfully"})
 	} else {
-		g.JSON(500, gin.H{"status": "failed", "data": nil})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
 	}
 }
 
@@ -57,13 +58,13 @@ func (s *TokenizationController) TokenizeText(g *gin.Context) {
 func (*TokenizationController) FilterText(g *gin.Context) {
 	var query model.QueryTokenization
 
-	if g.ShouldBind(&query) == nil {
+	if err := g.ShouldBind(&query); err == nil {
 		sservice := service.NewFilteringService(query.Language)
 		tservice := service.NewTokenizerService()
 		as := tservice.CreateToken(query.Text)
 		res := sservice.FilterText(as)
-		g.JSON(200, gin.H{"status": "success", "data": res})
+		g.JSON(200, gin.H{"status": "success", "data": res, "msg" : "Filtering successfully"})
 	} else {
-		g.JSON(500, gin.H{"status": "failed", "data": nil})
+		g.JSON(400, gin.H{"status": "failed", "data": nil, "msg" : err.Error()})
 	}
 }
